@@ -5,7 +5,6 @@ import (
     "android/soong/cc"
     "fmt"
     "strings"
-    "strconv"
 )
 
 func init() {
@@ -50,7 +49,7 @@ func getSharedLibs(ctx android.BaseContext) ([]string) {
 
 func getSrcs(ctx android.BaseContext) ([]string) {
     var src []string
-    sdkVersion := ctx.AConfig().PlatformSdkVersionInt()
+    sdkVersion := ctx.AConfig().PlatformSdkVersion().FinalOrPreviewInt()
     if (strings.EqualFold(ctx.AConfig().Getenv("TARGET_RK_GRALLOC_VERSION"),"4") ) {
         if (sdkVersion >= 30 ) {
             src = append(src, "platform_gralloc4.cpp")
@@ -61,8 +60,8 @@ func getSrcs(ctx android.BaseContext) ([]string) {
 
 func globalIncludeDefaults(ctx android.BaseContext) ([]string) {
     var include_dirs []string
-    version, err := strconv.Atoi(ctx.Config().PlatformSdkVersion())
-    if (err == nil && version < 29 ) {
+    version := ctx.AConfig().PlatformSdkVersion().FinalOrPreviewInt()
+    if (version < 29 ) {
         if (strings.EqualFold(ctx.AConfig().Getenv("TARGET_BOARD_PLATFORM_GPU"),"G6110")) {
             fmt.Println("G6110 don't contains hardware/rockchip/libgralloc!");
         } else {
@@ -87,7 +86,7 @@ func globalIncludeDefaults(ctx android.BaseContext) ([]string) {
         include_dirs = append(include_dirs, "system/core/libsync/include")
         include_dirs = append(include_dirs, "external/libdrm/include/drm")
     }
-    fmt.Println(include_dirs, ctx.Config().PlatformSdkVersion())
+    fmt.Println(include_dirs, ctx.AConfig().PlatformSdkVersion().String())
     return include_dirs
 
 }
